@@ -26,7 +26,12 @@ class RoverState :
 
     ## you do this.
     def __eq__(self, other):
-       pass
+        if not isinstance(other, RoverState):
+            return NotImplemented
+        return (self.loc == other.loc and
+                self.sample_extracted == other.sample_extracted and
+                self.holding_sample == other.holding_sample and
+                self.charged == other.charged)
 
 
     def __repr__(self):
@@ -99,9 +104,23 @@ def battery_goal(state) :
     return state.loc == "battery"
 ## add your goals here.
 
-def mission_complete(state) :
-    pass
+def is_station(state):
+    return state.loc == "station"
 
+def not_holding_sample(state):
+    return not state.holding_sample
+
+def is_sample_extracted(state):
+    return state.sample_extracted
+
+def is_charged(state):
+    return state.charged
+
+def mission_complete(state):
+    return (state.loc == "station"
+            and not_holding_sample(state)
+            and is_sample_extracted(state)
+            and is_charged(state))
 
 if __name__=="__main__" :
     s = RoverState()
