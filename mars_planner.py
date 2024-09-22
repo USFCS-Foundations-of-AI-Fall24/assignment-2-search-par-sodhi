@@ -14,7 +14,7 @@
 ## Charged can be True or False
 
 from copy import deepcopy
-from search_algorithms import breadth_first_search, depth_first_search
+from search_algorithms import breadth_first_search, depth_first_search, depth_limited_search
 
 
 class RoverState :
@@ -41,7 +41,7 @@ class RoverState :
         return (f"Location: {self.loc}\n" +
                 f"Sample Extracted?: {self.sample_extracted}\n"+
                 f"Holding Sample?: {self.holding_sample}\n" +
-                f"Holding Tool?: {self.holding_sample}\n" +
+                f"Holding Tool?: {self.holding_tool}\n" +
                 f"Charged? {self.charged}")
 
     def __hash__(self):
@@ -77,26 +77,28 @@ def move_to_battery(state) :
     r2.prev = state
     return r2
 # add tool functions here
-
 def pick_up_tool(state):
     if not state.holding_tool:
-        deepcopy(state).holding_tool = True
-        deepcopy(state).prev = state
-        return deepcopy(state)
+        r2 = deepcopy(state)
+        r2.holding_tool = True
+        r2.prev = state
+        return r2
     return state
 
 def drop_tool(state):
     if state.holding_tool:
-        deepcopy(state).holding_tool = False
-        deepcopy(state).prev = state
-        return deepcopy(state)
+        r2 = deepcopy(state)
+        r2.holding_tool = False
+        r2.prev = state
+        return r2
     return state
 
 def use_tool(state):
-    if state.holding_tool and state.loc == "sample" and not state.sample_extracted:
-        deepcopy(state).sample_extracted = True
-        deepcopy(state).prev = state
-        return deepcopy(state)
+    if state.loc == "sample" and state.holding_tool and not state.sample_extracted:
+        r2 = deepcopy(state)
+        r2.sample_extracted = True  # Set the sample as extracted
+        r2.prev = state
+        return r2
     return state
 
 def pick_up_sample(state) :
@@ -131,29 +133,30 @@ def battery_goal(state) :
 def is_station(state):
     return state.loc == "station"
 
-def not_holding_sample(state):
-    return not state.holding_sample
-
 def is_sample_extracted(state):
     return state.sample_extracted
 
 def is_charged(state):
     return state.charged
 
+#Mission Complete Function done
 def mission_complete(state):
-    return (state.loc == "station"
-            and not_holding_sample(state)
-            and is_sample_extracted(state)
-            and is_charged(state))
+    if state.loc == "station" and state.charged == True and state.sample_extracted == True and state.holding_tool == False:
+        print("-" * 50)
+        print("The Mission Has Been Completed")
+        print("-" * 50)
+        return True
+    return False
 
 if __name__=="__main__" :
     s = RoverState()
     print("Initial State\n")
     print(s)
+    print("Breadth First Search\n", breadth_first_search(s, action_list, mission_complete))
     result = breadth_first_search(s, action_list, mission_complete)
-    print("Depth First Search\n")
+    print("Depth First Search\n", depth_first_search(s, action_list, mission_complete))
     value = depth_first_search(s, action_list, mission_complete)
-    #print(result)
+    print("Depth Limited Search\n",depth_limited_search(s, action_list, mission_complete,limit=8) )
 
 
 
