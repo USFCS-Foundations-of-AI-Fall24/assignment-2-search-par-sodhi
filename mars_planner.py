@@ -150,13 +150,17 @@ def mission_complete(state):
 
 if __name__=="__main__" :
     s = RoverState()
-    print("Initial State\n")
-    print(s)
-    print("Breadth First Search\n", breadth_first_search(s, action_list, mission_complete))
-    result = breadth_first_search(s, action_list, mission_complete)
-    print("Depth First Search\n", depth_first_search(s, action_list, mission_complete))
-    value = depth_first_search(s, action_list, mission_complete)
-    print("Depth Limited Search\n",depth_limited_search(s, action_list, mission_complete,limit=8) )
+    print("Initial State\n",s)
+    print("\n")
+    print("Breadth First Search\n")
+    print(breadth_first_search(s, action_list, mission_complete))
+    print("\n")
+    print("Depth First Search\n")
+    print(depth_first_search(s, action_list, mission_complete))
+    print("\n")
+    print("Depth Limited Search\n")
+    print(depth_limited_search(s, action_list, mission_complete,limit=9))
+    print("\n")
 
 
 
