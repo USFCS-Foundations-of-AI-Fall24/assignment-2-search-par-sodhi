@@ -63,7 +63,7 @@ class RoverState :
 def move_to_sample(state) :
     r2 = deepcopy(state)
     r2.loc = "sample"
-    r2.prev=state
+    r2.prev = state
     return r2
 def move_to_station(state) :
     r2 = deepcopy(state)

@@ -42,8 +42,27 @@ def a_star(start_state, heuristic_fn, goal_test, use_closed_list=True) :
     search_queue = PriorityQueue()
     closed_list = {}
     search_queue.put(start_state)
-    ## you do the rest.
+    states_generated = 0
+    parent_map = {start_state: None}
 
+    while not search_queue.empty():
+        current_state = search_queue.get()[1]
+        states_generated += 1
+        if goal_test(current_state):
+            print(f"Goal reached: {current_state.location}")
+            return reconstruct_path(current_state, parent_map), states_generated
+
+def reconstruct_path(goal_state, parent_map):
+    path = []
+    current = goal_state
+    while current is not None:
+        path.append(current.location)
+        current = parent_map[current]
+    path.reverse()
+    print("Trail path:")
+    for location in path:
+        print(location)
+    return path
 
 ## default heuristic - we can use this to implement uniform cost search
 def h1(state) :
@@ -51,7 +70,12 @@ def h1(state) :
 
 ## you do this - return the straight-line distance between the state and (1,1)
 def sld(state) :
-    sqt(a^ + b2)
+    goal='1,1'
+    a1, b1 = map(int, state.location.split(','))
+    a2, b2 = map(int, goal.split(','))
+    print(f"Calculating SLD from {state.location} to {goal}: {math.sqrt((a1 - a2) ** 2 + (b1 - b2) ** 2)}")
+    return math.sqrt((a1 - a2) ** 2 + (b1 - b2) ** 2)
+
 
 ## you implement this. Open the file filename, read in each line,
 ## construct a Graph object and assign it to self.mars_graph().
@@ -96,7 +120,7 @@ def main():
     try:
         print("Loading the Mars graph from a TXT file...")
         mars_graph = read_mars_graph(filename)
-        print(mars_graph)
+        print(read_mars_graph(filename))
     except FileNotFoundError:
         print(f"Error: File {filename} not found.")
         return
