@@ -40,22 +40,23 @@ model.Add(A8 != A9)
 model.Add(A9 != A3)
 model.Add(A9 != A8)
 
-## Solver
-status = solver.Solve(model)
+def main():
+    ## Solver
+    status = solver.Solve(model)
 
-# Output results if solution found
-if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
-    print('Frequency assignment:')
-    print(f'Antenna 1: Frequency {solver.Value(A1)+1}')
-    print(f'Antenna 2: Frequency {solver.Value(A2)+1}')
-    print(f'Antenna 3: Frequency {solver.Value(A3)+1}')
-    print(f'Antenna 4: Frequency {solver.Value(A4)+1}')
-    print(f'Antenna 5: Frequency {solver.Value(A5)+1}')
-    print(f'Antenna 6: Frequency {solver.Value(A6)+1}')
-    print(f'Antenna 7: Frequency {solver.Value(A7)+1}')
-    print(f'Antenna 8: Frequency {solver.Value(A8)+1}')
-    print(f'Antenna 9: Frequency {solver.Value(A9)+1}')
-else:
-    print('No solution found.')
+    # Output results if solution found
+    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+        print('Frequency assignment:')
+        print(f'Antenna 1: Frequency {solver.Value(A1) + 1}')
+        print(f'Antenna 2: Frequency {solver.Value(A2) + 1}')
+        print(f'Antenna 3: Frequency {solver.Value(A3) + 1}')
+        print(f'Antenna 4: Frequency {solver.Value(A4) + 1}')
+        print(f'Antenna 5: Frequency {solver.Value(A5) + 1}')
+        print(f'Antenna 6: Frequency {solver.Value(A6) + 1}')
+        print(f'Antenna 7: Frequency {solver.Value(A7) + 1}')
+        print(f'Antenna 8: Frequency {solver.Value(A8) + 1}')
+        print(f'Antenna 9: Frequency {solver.Value(A9) + 1}')
+    else:
+        print('No solution found.')
 
 
