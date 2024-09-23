@@ -37,31 +37,45 @@ class map_state() :
     def is_goal(self):
         return self.location == '1,1'
 
-
-def a_star(start_state, heuristic_fn, goal_test, use_closed_list=True) :
+# Source I used to help with implementation: https://www.geeksforgeeks.org/a-search-algorithm/
+def a_star(start_state, h_value, use_closed_list=True) :
     search_queue = PriorityQueue()
-    closed_list = {}
-    search_queue.put(start_state)
-    states_generated = 0
-    parent_map = {start_state: None}
+    closed_list = set() if use_closed_list else None
+    search_queue.put((start_state.f, start_state))
+    state_count = 0
+    map_p = {start_state: None}
 
     while not search_queue.empty():
         current_state = search_queue.get()[1]
-        states_generated += 1
-        if goal_test(current_state):
+        state_count += 1
+        if current_state.is_goal():
             print(f"Goal reached: {current_state.location}")
-            return reconstruct_path(current_state, parent_map), states_generated
+            return display_path(current_state, map_p), state_count
 
-def reconstruct_path(goal_state, parent_map):
+        if use_closed_list and current_state.location in closed_list:
+            continue
+        closed_list.add(current_state.location)
+        mars_graph = current_state.mars_graph
+        edges = mars_graph.get_edges(current_state.location)
+
+        for edge in edges:
+            next_state = map_state(location=edge.dest, mars_graph=current_state.mars_graph, prev_state=current_state, g=current_state.g + edge.val)
+            next_state.h = h_value(next_state)
+            next_state.f = next_state.g + next_state.h
+            if use_closed_list and next_state.location in closed_list:
+                continue
+            search_queue.put((next_state.f, next_state))
+            map_p[next_state] = current_state
+    print("Cannot find route.")
+    return None, state_count
+
+def display_path(goal_state, parent_map):
     path = []
     current = goal_state
     while current is not None:
         path.append(current.location)
         current = parent_map[current]
     path.reverse()
-    print("Trail path:")
-    for location in path:
-        print(location)
     return path
 
 ## default heuristic - we can use this to implement uniform cost search
@@ -70,10 +84,10 @@ def h1(state) :
 
 ## you do this - return the straight-line distance between the state and (1,1)
 def sld(state) :
-    goal='1,1'
+    goal = "1,1"
     a1, b1 = map(int, state.location.split(','))
-    a2, b2 = map(int, goal.split(','))
-    print(f"Calculating SLD from {state.location} to {goal}: {math.sqrt((a1 - a2) ** 2 + (b1 - b2) ** 2)}")
+    a2, b2 = map(int, goal.split(","))
+    # print(f"Calculating SLD from {state.location} to {goal}: {math.sqrt((a1 - a2) ** 2 + (b1 - b2) ** 2)}")
     return math.sqrt((a1 - a2) ** 2 + (b1 - b2) ** 2)
 
 
@@ -81,14 +95,12 @@ def sld(state) :
 ## construct a Graph object and assign it to self.mars_graph().
 def read_mars_graph(filename):
     graph = Graph()
-    print("Initializing new graph object.")
     with open(filename, 'r') as file:
         for line in file:
             if line:
                 current_node, locations = parse_line(line)
                 if current_node not in graph.g:
                     graph.add_node(current_node)
-                    print(f"Added new node: {current_node}")
                 process_locations(current_node, locations, graph)
     print("Graph loading complete.")
     return graph
@@ -109,24 +121,41 @@ def process_locations(current_node, locations, graph):
         if current_location:
             if current_location not in graph.g:
                 graph.add_node(current_location)
-                print(f"Added new node: {current_location}")
+                # print(f"Added new node: {current_location}")
             graph.add_edge(Edge(current_node, current_location, 1))
-            print(f"Added edge from {current_node} to {current_location} with default weight 1")
+            # print(f"Added edge from {current_node} to {current_location} with default weight 1")
         index += 1
 
 
 def main():
     filename = "marsmap.txt"
     try:
-        print("Loading the Mars graph from a TXT file...")
+        print(f"Mars graph creating from {filename}")
         mars_graph = read_mars_graph(filename)
-        print(read_mars_graph(filename))
     except FileNotFoundError:
         print(f"Error: File {filename} not found.")
         return
     except Exception as e:
         print(f"An error occurred while reading the Mars graph: {e}")
         return
+
+    start_state = map_state(location="8,8", mars_graph=mars_graph, g=0)
+
+    print("\nRunning A* Search with SLD:")
+    try:
+        answer_generated_a_star, states_generated_a_star = a_star(start_state, sld)
+        print("A* Search Result:", answer_generated_a_star)
+        print(f"States by A* with SLD: {states_generated_a_star}")
+    except Exception as e:
+        print(f"An error occurred during A* search with SLD heuristic: {e}")
+
+    print("\nRunning Uniform Cost Search:")
+    try:
+        answer_generated_uniform, states_generated_uniform = a_star(start_state, h1)
+        print("Uniform Search Result:", answer_generated_uniform)
+        print(f"States by UCS: {states_generated_uniform}")
+    except Exception as e:
+        print(f"An error occurred during Uniform Cost Search: {e}")
 
 if __name__ == "__main__":
     main()
