@@ -96,7 +96,7 @@ def drop_tool(state):
 def use_tool(state):
     if state.loc == "sample" and state.holding_tool and not state.sample_extracted:
         r2 = deepcopy(state)
-        r2.sample_extracted = True  # Set the sample as extracted
+        r2.sample_extracted = True
         r2.prev = state
         return r2
     return state
@@ -129,28 +129,48 @@ action_list = [charge, drop_sample,pick_up_sample, move_to_sample, move_to_batte
 def battery_goal(state) :
     return state.loc == "battery"
 ## add your goals here.
-
-def is_station(state):
-    return state.loc == "station"
-
-def is_sample_extracted(state):
-    return state.sample_extracted
-
-def is_charged(state):
-    return state.charged
-
 #Mission Complete Function done
 def mission_complete(state):
-    if state.loc == "station" and state.charged == True and state.sample_extracted == True and state.holding_tool == False:
+    if state.loc == "battery" and state.charged == True and state.sample_extracted == True and state.holding_sample == False and state.holding_tool == False:
         print("-" * 50)
         print("The Mission Has Been Completed")
         print("-" * 50)
         return True
     return False
 
-if __name__=="__main__" :
+
+def problem_decomposition():
+    initial_state = RoverState()
+
+    move_to_sample = lambda state: state.loc == "sample"
+    print("Subproblem 1: Move to Sample(Breadth First Search)")
+    print(breadth_first_search(initial_state, action_list, move_to_sample))
+    print("\nSubproblem 1: Move to Sample(Depth First Search)")
+    print(depth_first_search(initial_state, action_list, move_to_sample))
+    print("\nSubproblem 1: Move to Sample(Depth Limited Search)")
+    print(depth_limited_search(initial_state, action_list, move_to_sample))
+
+    sample_location_state = RoverState(loc="sample", holding_tool=True)
+    remove_sample = lambda state: state.sample_extracted and state.holding_sample == True
+    print("\nSubproblem 2: Remove Sample(Breadth First Search)")
+    print(breadth_first_search(sample_location_state, action_list, remove_sample))
+    print("\nSubproblem 2: Remove Sample(Depth First Search)")
+    print(depth_first_search(sample_location_state, action_list, remove_sample))
+    print("\nSubproblem 2: Remove Sample(Depth Limited Search)")
+    print(depth_limited_search(sample_location_state, action_list, remove_sample))
+
+    sample_extracted_state = RoverState(loc="sample", sample_extracted=True, holding_sample=True)
+    return_to_charger = lambda state: state.loc == "battery"
+    print("\nSubproblem 3: Return to Charger(Breadth First Search)")
+    print(breadth_first_search(sample_extracted_state, action_list, return_to_charger))
+    print("\nSubproblem 3: Return to Charger(Depth First Search)")
+    print(depth_first_search(sample_extracted_state, action_list, return_to_charger))
+    print("\nSubproblem 3: Return to Charger(Depth Limited Search)")
+    print(depth_limited_search(sample_extracted_state, action_list, return_to_charger, limit=3))
+
+def main():
     s = RoverState()
-    print("Initial State\n",s)
+    print("Initial State\n", s)
     print("\n")
     print("Breadth First Search\n")
     print(breadth_first_search(s, action_list, mission_complete))
@@ -159,8 +179,11 @@ if __name__=="__main__" :
     print(depth_first_search(s, action_list, mission_complete))
     print("\n")
     print("Depth Limited Search\n")
-    print(depth_limited_search(s, action_list, mission_complete,limit=9))
+    print(depth_limited_search(s, action_list, mission_complete, limit=7))
     print("\n")
+
+if __name__=="__main__" :
+    main()
 
 
 
