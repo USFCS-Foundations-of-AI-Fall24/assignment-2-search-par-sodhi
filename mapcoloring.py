@@ -44,7 +44,6 @@ def main():
     ## Solver
     status = solver.Solve(model)
 
-    # Output results if solution found
     if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
         print('Frequency assignment:')
         print(f'Antenna 1: Frequency {solver.Value(A1) + 1}')
