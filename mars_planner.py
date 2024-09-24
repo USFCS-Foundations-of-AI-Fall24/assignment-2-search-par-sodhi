@@ -149,27 +149,27 @@ def mission_complete(state):
 def problem_decomposition():
     initial_state = RoverState()
 
-    print("Subproblem 1: Move to Sample(Breadth First Search)")
+    print("Problem 1: Move to Sample(Breadth First Search)")
     print(breadth_first_search(initial_state, action_list, move_to_sample))
-    print("\nSubproblem 1: Move to Sample(Depth First Search)")
+    print("\nProblem 1: Move to Sample(Depth First Search)")
     print(depth_first_search(initial_state, action_list, move_to_sample))
-    print("\nSubproblem 1: Move to Sample(Depth Limited Search)")
+    print("\nProblem 1: Move to Sample(Depth Limited Search)")
     print(depth_limited_search(initial_state, action_list, move_to_sample,limit=7))
 
     sample_location_state = RoverState(loc="sample", holding_tool=True)
-    print("\nSubproblem 2: Remove Sample(Breadth First Search)")
+    print("\nProblem 2: Remove Sample(Breadth First Search)")
     print(breadth_first_search(sample_location_state, action_list, remove_sample))
-    print("\nSubproblem 2: Remove Sample(Depth First Search)")
+    print("\nProblem 2: Remove Sample(Depth First Search)")
     print(depth_first_search(sample_location_state, action_list, remove_sample))
-    print("\nSubproblem 2: Remove Sample(Depth Limited Search)")
+    print("\nProblem 2: Remove Sample(Depth Limited Search)")
     print(depth_limited_search(sample_location_state, action_list, remove_sample, limit =7))
 
     sample_extracted_state = RoverState(loc="sample", sample_extracted=True, holding_sample=True)
-    print("\nSubproblem 3: Return to Charger(Breadth First Search)")
+    print("\nProblem 3: Return to Charger(Breadth First Search)")
     print(breadth_first_search(sample_extracted_state, action_list, battery_goal))
-    print("\nSubproblem 3: Return to Charger(Depth First Search)")
+    print("\nProblem 3: Return to Charger(Depth First Search)")
     print(depth_first_search(sample_extracted_state, action_list, battery_goal))
-    print("\nSubproblem 3: Return to Charger(Depth Limited Search)")
+    print("\nProblem 3: Return to Charger(Depth Limited Search)")
     print(depth_limited_search(sample_extracted_state, action_list, battery_goal, limit=7))
 
 def main():
